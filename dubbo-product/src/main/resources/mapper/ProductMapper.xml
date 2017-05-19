@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.product.dao.ProductDaoMapper">
+  <sql id="tableName">product</sql>
+  <sql id="columns">
+    p.productId,p.productName,p.count,p.price
+  </sql>
+  <sql id="insertColumns">
+    productId,productName,count,price
+  </sql>
+  <sql id="productIf">
+    <if test="productId != null and productId != ''">productId=#{productId},</if>
+    <if test="productName != null and productName != ''">productName=#{productName},</if>
+    <if test="count != null and count != ''">count=#{count},</if>
+    <if test="price != null and price != ''">count=#{price}</if>
+  </sql>
+  <sql id="productSelector">
+    select
+      <include refid="columns"/>
+    from
+      <include refid="tableName"/>
+    AS p
+  </sql>
+
+  <sql id="productWhere">
+    <where>
+      <if test="productId != null and productId != ''">
+        productId = #{productId}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="productUpdate">
+    <trim prefix="SET" suffixOverrides=",">
+      <include refid="productIf"/>
+    </trim>
+  </sql>
+
+<!-- =================================================================== -->
+
+  <select id="load" parameterType="Product" resultType="Product">
+    <include refid="productSelector"/>
+    <include refid="productWhere"/>
+  </select>
+
+  <!-- 获取全部 -->
+  <select id="loadAll" resultType="Product">
+    <include refid="productSelector"/>
+    <include refid="productWhere"/>
+  </select>
+
+  <!-- 更新 -->
+  <update id="update" parameterType="Product">
+    UPDATE <include refid="tableName"/>
+    <include refid="productUpdate"/>
+    <include refid="productWhere"/>
+  </update>
+  <!-- 插入 -->
+  <insert id="save" parameterType="Product">
+    INSERT INTO
+    <include refid="tableName"/>
+    (
+    <include refid="insertColumns"/>
+    )
+    VALUES
+    (
+    #{productId},#{productName},#{count},#{price}
+    )
+  </insert>
+
+</mapper>
+

@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.account.dao.AccountDaoMapper">
+  <sql id="tableName">account</sql>
+  <sql id="columns">
+    a.accountId,a.userId,a.balance
+  </sql>
+  <sql id="insertColumns">
+    accountId,userId,balance
+  </sql>
+  <sql id="accountIf">
+    <if test="accountId != null and accountId != ''">accountId=#{accountId},</if>
+    <if test="userId != null and userId != ''">userId=#{userId},</if>
+    <if test="balance != null and balance != ''">balance=#{balance}</if>
+  </sql>
+  <sql id="accountSelector">
+    select
+      <include refid="columns"/>
+    from
+      <include refid="tableName"/> AS a
+  </sql>
+
+  <sql id="accountWhere">
+    <where>
+      <if test="accountId != null and accountId != ''">
+        accountId = #{accountId}
+      </if>
+      <if test="userId != null and userId != ''">
+        AND userId = #{userId}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="accountUpdate">
+    <trim prefix="SET" suffixOverrides=",">
+      <include refid="accountIf"/>
+    </trim>
+  </sql>
+
+<!-- =================================================================== -->
+
+  <select id="load" parameterType="Account" resultType="Account">
+    <include refid="accountSelector"/>
+    <include refid="accountWhere"/>
+  </select>
+
+  <!-- 获取全部 -->
+  <select id="loadAll" resultType="Account">
+    <include refid="accountSelector"/>
+    <include refid="accountWhere"/>
+  </select>
+
+  <!-- 更新 -->
+  <update id="update" parameterType="Account">
+    UPDATE <include refid="tableName"/>
+    <include refid="accountUpdate"/>
+    <include refid="accountWhere"/>
+  </update>
+  <!-- 插入 -->
+  <insert id="save" parameterType="Account">
+    INSERT INTO
+    <include refid="tableName"/>
+    (
+    <include refid="insertColumns"/>
+    )
+    VALUES
+    (
+    #{accountId},#{userId},#{balance}
+    )
+  </insert>
+
+</mapper>
+

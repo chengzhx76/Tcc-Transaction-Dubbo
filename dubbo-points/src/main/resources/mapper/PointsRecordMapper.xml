@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.points.dao.PointsRecordDaoMapper">
+  <sql id="tableName">pointsRecord</sql>
+  <sql id="columns">
+    pr.id,pr.pointsId,pr.orderNo,pr.cost,pr.state
+  </sql>
+  <sql id="insertColumns">
+    id,pointsId,orderNo,cost,state
+  </sql>
+  <sql id="pointsRecordIf">
+    <if test="id != null and id != ''">id=#{id},</if>
+    <if test="pointsId != null and pointsId != ''">pointsId=#{pointsId},</if>
+    <if test="orderNo != null and orderNo != ''">orderNo=#{orderNo},</if>
+    <if test="cost != null and cost != ''">cost=#{cost},</if>
+    <if test="state != null and state != ''">state=#{state}</if>
+  </sql>
+  <sql id="pointsRecordSelector">
+    select
+      <include refid="columns"/>
+    from
+      <include refid="tableName"/>
+    AS pr
+  </sql>
+
+  <sql id="pointsRecordWhere">
+    <where>
+      <if test="id != null and id != ''">
+        id = #{id}
+      </if>
+      <if test="pointsId != null and pointsId != ''">
+        AND pointsId = #{pointsId}
+      </if>
+      <if test="orderNo != null and orderNo != ''">
+        AND orderNo = #{orderNo}
+      </if>
+      <if test="state != null and state != ''">
+        AND state = #{state}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="pointsRecordUpdate">
+    <trim prefix="SET" suffixOverrides=",">
+      <include refid="pointsRecordIf"/>
+    </trim>
+  </sql>
+
+<!-- =================================================================== -->
+
+  <select id="load" parameterType="pointsRecord" resultType="pointsRecord">
+    <include refid="pointsRecordSelector"/>
+    <include refid="pointsRecordWhere"/>
+  </select>
+
+  <!-- 获取全部 -->
+  <select id="loadAll" resultType="pointsRecord">
+    <include refid="pointsRecordSelector"/>
+    <include refid="pointsRecordWhere"/>
+  </select>
+
+  <!-- 更新 -->
+  <update id="update" parameterType="pointsRecord">
+    UPDATE <include refid="tableName"/>
+    <include refid="pointsRecordUpdate"/>
+    <include refid="pointsRecordWhere"/>
+  </update>
+  <!-- 插入 -->
+  <insert id="save" parameterType="pointsRecord">
+    INSERT INTO
+    <include refid="tableName"/>
+    (
+    <include refid="insertColumns"/>
+    )
+    VALUES
+    (
+    #{id},#{pointsId},#{orderNo},#{cost},#{state}
+    )
+  </insert>
+
+</mapper>
+

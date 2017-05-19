@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.order.dao.OrderDetailDaoMapper">
+  <sql id="tableName">orderDetail</sql>
+  <sql id="columns">
+    od.id,od.orderNO,od.productId,od.number,od.unitPrice
+  </sql>
+  <sql id="insertColumns">
+    id,orderNO,productId,number,unitPrice
+  </sql>
+  <sql id="orderDetailIf">
+    <if test="id != null and id != ''">id=#{id},</if>
+    <if test="orderNO != null and orderNO != ''">orderNO=#{orderNO},</if>
+    <if test="productId != null and productId != ''">productId=#{productId},</if>
+    <if test="number != null and number != ''">number=#{number},</if>
+    <if test="unitPrice != null and unitPrice != ''">unitPrice=#{unitPrice}</if>
+  </sql>
+  <sql id="orderDetailSelector">
+    select
+      <include refid="columns"/>
+    from
+      <include refid="tableName"/> AS ar
+  </sql>
+
+  <sql id="orderDetailWhere">
+    <where>
+      <if test="id != null and id != ''">
+        id = #{id}
+      </if>
+      <if test="orderNO != null and orderNO != ''">
+        AND orderNO = #{orderNO}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="orderDetailUpdate">
+    <trim prefix="SET" suffixOverrides=",">
+      <include refid="orderDetailIf"/>
+    </trim>
+  </sql>
+
+<!-- =================================================================== -->
+
+  <select id="load" parameterType="orderDetail" resultType="orderDetail">
+    <include refid="orderDetailSelector"/>
+    <include refid="orderDetailWhere"/>
+  </select>
+
+  <!-- 获取全部 -->
+  <select id="loadAll" resultType="orderDetail">
+    <include refid="orderDetailSelector"/>
+    <include refid="orderDetailWhere"/>
+  </select>
+
+  <!-- 更新 -->
+  <update id="update" parameterType="orderDetail">
+    UPDATE <include refid="tableName"/>
+    <include refid="orderDetailUpdate"/>
+    <include refid="orderDetailWhere"/>
+  </update>
+  <!-- 插入 -->
+  <insert id="save" parameterType="orderDetail">
+    INSERT INTO
+    <include refid="tableName"/>
+    (
+    <include refid="insertColumns"/>
+    )
+    VALUES
+    (
+    #{id},#{orderNO},#{productId},#{number},#{unitPrice}
+    )
+  </insert>
+
+</mapper>
+

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+    http://www.springframework.org/schema/tx
+    http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+    http://www.springframework.org/schema/aop
+    http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+	  <property name="driverClassName" value="${jdbc.driverClassName}"/>
+	  <property name="url" value="${jdbc.url}"/>
+	  <property name="username" value="${jdbc.username}"/>
+	  <property name="password" value="${jdbc.password}"/>
+	  <!-- 连接池最大使用连接数 -->
+	  <property name="maxActive" value="${jdbc.maxActive}"/>
+	  <!-- 初始化连接大小 -->
+	  <property name="initialSize" value="${jdbc.initialSize}"/>
+	  <!-- 获取连接最大等待时间 -->
+	  <property name="maxWait" value="${jdbc.maxWait}"/>
+	  <!-- 连接池最大空闲 -->
+	  <!--  property name="maxIdle" value="${jdbc.maxIdle}"/>-->
+	  <!-- 连接池最小空闲 -->
+	  <property name="minIdle" value="${jdbc.minIdle}"/>
+	  <!-- 自动清除无用连接 -->
+	  <property name="removeAbandoned" value="${jdbc.removeAbandoned}"/>
+	  <!-- 清除无用连接的等待时间 -->
+	  <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}"/>
+	  <!-- 连接属性 -->
+	  <property name="connectionProperties" value="${jdbc.connectionProperties}"/>
+	</bean>
+
+	<bean id="tccDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClassName}"/>
+		<property name="url" value="${tcc.jdbc.url}"/>
+		<property name="username" value="${jdbc.username}"/>
+		<property name="password" value="${jdbc.password}"/>
+		<!-- 连接池最大使用连接数 -->
+		<property name="maxActive" value="${jdbc.maxActive}"/>
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="${jdbc.initialSize}"/>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="${jdbc.maxWait}"/>
+		<!-- 连接池最大空闲 -->
+		<!--  property name="maxIdle" value="${jdbc.maxIdle}"/>-->
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="${jdbc.minIdle}"/>
+		<!-- 自动清除无用连接 -->
+		<property name="removeAbandoned" value="${jdbc.removeAbandoned}"/>
+		<!-- 清除无用连接的等待时间 -->
+		<property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}"/>
+		<!-- 连接属性 -->
+		<property name="connectionProperties" value="${jdbc.connectionProperties}"/>
+	</bean>
+
+  <!-- 注入SQLSession -->
+  <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate" scope="prototype">
+    <constructor-arg index="0" ref="sqlSessionFactory"/>
+  </bean>
+
+	<!-- mybatis配置 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+		p:dataSource-ref="dataSource"
+		p:typeAliasesPackage="com.cheng.order.model"
+		p:mapperLocations="classpath:/mapper/*.xml" />
+
+	<!-- spring与mybatis整合配置，扫描所有dao -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
+		p:basePackage="com.cheng.order.dao"
+		p:sqlSessionFactoryBeanName="sqlSessionFactory" />
+
+	<!-- 对数据源进行事务管理 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="dataSource" />
+	<!-- 通知 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+	  <!-- 传播行为 -->
+	  <tx:attributes>
+	  	<tx:method name="add*" propagation="REQUIRED"/>
+	  	<tx:method name="save*" propagation="REQUIRED"/>
+	  	<tx:method name="update*" propagation="REQUIRED"/>
+	  	<tx:method name="delete*" propagation="REQUIRED"/>
+	  	<tx:method name="create*" propagation="REQUIRED"/>
+	  	<tx:method name="make*" propagation="REQUIRED"/>
+	  	<tx:method name="confirm*" propagation="REQUIRED"/>
+	  	<tx:method name="cancel*" propagation="REQUIRED"/>
+	  	<tx:method name="load*" propagation="SUPPORTS" read-only="true"/>
+	  	<tx:method name="get*" propagation="SUPPORTS" read-only="true"/>
+	  	<tx:method name="find*" propagation="SUPPORTS" read-only="true"/>
+	  </tx:attributes>
+	</tx:advice>	
+	<!-- 哪些类的哪些方法使用事务 -->
+	<aop:config>
+	  <aop:advisor advice-ref="txAdvice" pointcut="execution(* com.cheng.order.*.*(..))"/>
+	</aop:config>
+		
+	<!-- 开启事务注解驱动 
+    <tx:annotation-driven />
+    -->
+
+  <!-- 设置恢复策略(可选），V1.1.0 新增定时任务配置 -->
+  <bean class="org.mengyun.tcctransaction.spring.recover.DefaultRecoverConfig">
+    <!-- maxRetryCount表示一个事务最多尝试恢复次数，超过将不在自动恢复，需要人工干预，默认是30次 -->
+    <property name="maxRetryCount" value="3"/>
+    <!-- recoverDuration表示一个事务日志当超过一定时间间隔后没有更新就会被认为是发生了异常，需要恢复，
+      恢复Job将扫描超过这个时间间隔依旧没有更新的事务日志，并对这些事务进行恢复，时间单位是秒，默认是120秒 -->
+    <property name="recoverDuration" value="60"/>
+    <!-- cronExpression表示恢复Job触发间隔配置，默认是(每分钟)0 */1 * * * ? -->
+    <property name="cronExpression" value="0 */1 * * * ?"/>
+  </bean>
+
+  <!-- 使用SpringJdbc事务库（继承于JDBC事务库） -->
+  <bean id="transactionRepository"
+        class="org.mengyun.tcctransaction.spring.repository.SpringJdbcTransactionRepository">
+    <property name="dataSource" ref="tccDataSource"/>
+    <property name="domain" value="ORDER"/>
+    <property name="tbSuffix" value="_ORD"/>
+  </bean>
+
+
+</beans>

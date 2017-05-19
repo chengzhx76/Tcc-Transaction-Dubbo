@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.order.dao.OrdersDaoMapper">
+  <sql id="tableName">orders</sql>
+  <sql id="columns">
+    o.orderNo,o.userId,o.castAmount,o.costPoints,o.state
+  </sql>
+  <sql id="insertColumns">
+    orderNo,userId,castAmount,costPoints,state
+  </sql>
+  <sql id="ordersIf">
+    <if test="orderNo != null and orderNo != ''">orderNo=#{orderNo},</if>
+    <if test="userId != null and userId != ''">userId=#{userId},</if>
+    <if test="castAmount != null and castAmount != ''">castAmount=#{castAmount},</if>
+    <if test="costPoints != null and costPoints != ''">castAmount=#{costPoints},</if>
+    <if test="state != null and state != ''">state=#{state}</if>
+  </sql>
+  <sql id="ordersSelector">
+    select
+      <include refid="columns"/>
+    from
+      <include refid="tableName"/>
+    AS p
+  </sql>
+
+  <sql id="ordersWhere">
+    <where>
+      <if test="orderNo != null and orderNo != ''">
+        orderNo = #{orderNo}
+      </if>
+      <if test="userId != null and userId != ''">
+        AND userId = #{userId}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="ordersUpdate">
+    <trim prefix="SET" suffixOverrides=",">
+      <include refid="ordersIf"/>
+    </trim>
+  </sql>
+
+<!-- =================================================================== -->
+
+  <select id="load" parameterType="orders" resultType="orders">
+    <include refid="ordersSelector"/>
+    <include refid="ordersWhere"/>
+  </select>
+
+  <!-- 获取全部 -->
+  <select id="loadAll" resultType="orders">
+    <include refid="ordersSelector"/>
+    <include refid="ordersWhere"/>
+  </select>
+
+  <!-- 更新 -->
+  <update id="update" parameterType="orders">
+    UPDATE <include refid="tableName"/>
+    <include refid="ordersUpdate"/>
+    <include refid="ordersWhere"/>
+  </update>
+  <!-- 插入 -->
+  <insert id="save" parameterType="orders">
+    INSERT INTO
+    <include refid="tableName"/>
+    (
+    <include refid="insertColumns"/>
+    )
+    VALUES
+    (
+    #{orderNo},#{userId},#{castAmount},#{costPoints},#{state}
+    )
+  </insert>
+
+</mapper>
+

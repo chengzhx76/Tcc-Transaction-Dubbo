@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.points.dao.PointsDaoMapper">
+  <sql id="tableName">points</sql>
+  <sql id="columns">
+    p.pointsId,p.userId,p.balance
+  </sql>
+  <sql id="insertColumns">
+    pointsId,userId,balance
+  </sql>
+  <sql id="pointsIf">
+    <if test="pointsId != null and pointsId != ''">pointsId=#{pointsId},</if>
+    <if test="userId != null and userId != ''">userId=#{userId},</if>
+    <if test="balance != null and balance != ''">balance=#{balance}</if>
+  </sql>
+  <sql id="pointsSelector">
+    select
+      <include refid="columns"/>
+    from
+      <include refid="tableName"/>
+    AS p
+  </sql>
+
+  <sql id="pointsWhere">
+    <where>
+      <if test="pointsId != null and pointsId != ''">
+        pointsId = #{pointsId}
+      </if>
+      <if test="userId != null and userId != ''">
+        AND userId = #{userId}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="pointsUpdate">
+    <trim prefix="SET" suffixOverrides=",">
+      <include refid="pointsIf"/>
+    </trim>
+  </sql>
+
+<!-- =================================================================== -->
+
+  <select id="load" parameterType="points" resultType="points">
+    <include refid="pointsSelector"/>
+    <include refid="pointsWhere"/>
+  </select>
+
+  <!-- 获取全部 -->
+  <select id="loadAll" resultType="points">
+    <include refid="pointsSelector"/>
+    <include refid="pointsWhere"/>
+  </select>
+
+  <!-- 更新 -->
+  <update id="update" parameterType="points">
+    UPDATE <include refid="tableName"/>
+    <include refid="pointsUpdate"/>
+    <include refid="pointsWhere"/>
+  </update>
+  <!-- 插入 -->
+  <insert id="save" parameterType="points">
+    INSERT INTO
+    <include refid="tableName"/>
+    (
+    <include refid="insertColumns"/>
+    )
+    VALUES
+    (
+    #{pointsId},#{userId},#{balance}
+    )
+  </insert>
+
+</mapper>
+

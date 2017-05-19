@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cheng.account.dao.AccountRecordDaoMapper">
+  <sql id="tableName">accountRecord</sql>
+  <sql id="columns">
+    ar.id,ar.accountId,ar.orderNo,ar.amount,ar.state
+  </sql>
+  <sql id="insertColumns">
+    id,accountId,orderNo,amount,state
+  </sql>
+  <sql id="accountRecordIf">
+    <if test="id != null and id != ''">id=#{id},</if>
+    <if test="accountId != null and accountId != ''">accountId=#{accountId},</if>
+    <if test="orderNo != null and orderNo != ''">orderNo=#{orderNo},</if>
+    <if test="amount != null and amount != ''">amount=#{amount},</if>
+    <if test="state != null and state != ''">state=#{state}</if>
+  </sql>
+  <sql id="accountRecordSelector">
+    select
+      <include refid="columns"/>
+    from
+      <include refid="tableName"/> AS ar
+  </sql>
+
+  <sql id="accountRecordWhere">
+    <where>
+      <if test="id != null and id != ''">
+        id = #{id}
+      </if>
+      <if test="accountId != null and accountId != ''">
+        AND accountId = #{accountId}
+      </if>
+      <if test="state != null and state != ''">
+        AND state = #{state}
+      </if>
+    </where>
+  </sql>
+
+  <sql id="accountRecordUpdate">
+    <trim prefix="SET" suffixOverrides=",">
+      <include refid="accountRecordIf"/>
+    </trim>
+  </sql>
+
+<!-- =================================================================== -->
+
+  <select id="load" parameterType="accountRecord" resultType="accountRecord">
+    <include refid="accountRecordSelector"/>
+    <include refid="accountRecordWhere"/>
+  </select>
+
+  <!-- 获取全部 -->
+  <select id="loadAll" resultType="accountRecord">
+    <include refid="accountRecordSelector"/>
+    <include refid="accountRecordWhere"/>
+  </select>
+
+  <!-- 更新 -->
+  <update id="update" parameterType="accountRecord">
+    UPDATE <include refid="tableName"/>
+    <include refid="accountRecordUpdate"/>
+    <include refid="accountRecordWhere"/>
+  </update>
+  <!-- 插入 -->
+  <insert id="save" parameterType="accountRecord">
+    INSERT INTO
+    <include refid="tableName"/>
+    (
+    <include refid="insertColumns"/>
+    )
+    VALUES
+    (
+    #{id},#{accountId},#{orderNo},#{amount},#{state}
+    )
+  </insert>
+
+</mapper>
+
