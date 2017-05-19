@@ -53,7 +53,7 @@ public class TccCompensableAspect implements Ordered {
      */
     @Around("compensableService()")
     public Object interceptCompensableMethod(ProceedingJoinPoint pjp) throws Throwable {
-    	LOG.debug("==>interceptCompensableMethod");
+    	LOG.debug("-->环绕通知拦截器");
         return compensableTransactionInterceptor.interceptCompensableMethod(pjp);
     }
 

@@ -5,13 +5,6 @@
        xmlns:aop="http://www.springframework.org/schema/aop" xmlns:task="http://www.springframework.org/schema/task"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd   http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
-	<!-- ======================================================================== -->
-	<!-- 龙果学院 (www.roncoo.com) 超级教程系列 -->
-	<!-- 《微服务架构的分布式事务解决方案》视频教程 -->
-	<!-- 讲师：吴水成（水到渠成），840765167@qq.com -->
-	<!-- 课程地址：http://www.roncoo.com/course/view/7ae3d7eddc4742f78b0548aa8bd9ccdb -->
-	<!-- ======================================================================== -->
-
 	<!-- 开启Spring对@AspectJ风格切面的支持(因为下面用到自定义的TCC补偿切面类) -->
 	<!-- @Aspect注解不能被Spring自动识别并注册为Bean,因此要通过xml的bean配置,或通过@Compenent注解标识其为Spring管理Bean -->
     <aop:aspectj-autoproxy/>
