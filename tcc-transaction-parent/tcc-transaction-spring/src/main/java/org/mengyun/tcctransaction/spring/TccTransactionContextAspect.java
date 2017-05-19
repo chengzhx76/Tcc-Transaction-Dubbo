@@ -53,7 +53,7 @@ public class TccTransactionContextAspect implements Ordered {
      */
     @Around("transactionContextCall()")
     public Object interceptTransactionContextMethod(ProceedingJoinPoint pjp) throws Throwable {
-    	LOG.debug("==>interceptTransactionContextMethod(ProceedingJoinPoint pjp)");
+    	LOG.debug("-->定义环绕通知");
         return resourceCoordinatorInterceptor.interceptTransactionContextMethod(pjp);
     }
 
