@@ -103,21 +103,14 @@ public class ResourceCoordinatorInterceptor {
 
         Class targetClass = ReflectionUtils.getDeclaringType(pjp.getTarget().getClass(), method.getName(), method.getParameterTypes());
 
-        // 构建确认方法的提交上下文
-        InvocationContext confirmInvocation = new InvocationContext(targetClass,
-                confirmMethodName,
-                method.getParameterTypes(), pjp.getArgs());
+        // 构建确认方法的提交上下文（反射执行确认方法）
+        InvocationContext confirmInvocation = new InvocationContext(targetClass, confirmMethodName, method.getParameterTypes(), pjp.getArgs());
         
-        // 构建取消方法的提交上下文
-        InvocationContext cancelInvocation = new InvocationContext(targetClass,
-                cancelMethodName,
-                method.getParameterTypes(), pjp.getArgs());
+        // 构建取消方法的提交上下文（反射执行取消方法）
+        InvocationContext cancelInvocation = new InvocationContext(targetClass, cancelMethodName, method.getParameterTypes(), pjp.getArgs());
 
         // 构建参与者对像
-        Participant participant =
-                new Participant(
-                        xid,
-                        new Terminator(confirmInvocation, cancelInvocation));
+        Participant participant = new Participant(xid, new Terminator(confirmInvocation, cancelInvocation));
 
         transaction.enlistParticipant(participant); // 加入参与者
 

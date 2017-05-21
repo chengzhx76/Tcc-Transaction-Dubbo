@@ -29,6 +29,13 @@ public class InvocationContext implements Serializable {
 
     }
 
+    /**
+     * 反射执行确定和取消方法
+     * @param targetClass 目标类
+     * @param methodName 目标方法
+     * @param parameterTypes 参数类型
+     * @param args 参数
+     */
     public InvocationContext(Class targetClass, String methodName, Class[] parameterTypes, Object... args) {
         this.methodName = methodName;
         this.parameterTypes = parameterTypes;
